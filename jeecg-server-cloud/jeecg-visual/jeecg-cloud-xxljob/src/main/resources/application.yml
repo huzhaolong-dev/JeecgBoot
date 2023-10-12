@@ -4,6 +4,14 @@ server:
       context-path: /xxl-job-admin
   #数据源配置
 spring:
+  cloud:
+    inetutils:
+      timeout-seconds: 5
+      preferredNetworks:
+        - 192.168.2.*
+      ignored-interfaces:
+        - VMware Virtual Ethernet Adapter for VMnet1
+        - VMware Virtual Ethernet Adapter for VMnet8
   datasource:
     url: jdbc:mysql://jeecg-boot-mysql:3306/xxl_job?Unicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: ${MYSQL-USER:root}

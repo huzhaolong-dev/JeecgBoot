@@ -7,6 +7,14 @@ server:
       pattern: '%h %l %u %t "%r" %s %b %D %{User-Agent}i %{Request-Source}i'
     basedir: ''
 spring:
+  cloud:
+    inetutils:
+      timeout-seconds: 5
+      preferredNetworks:
+        - 192.168.2.*
+      ignored-interfaces:
+        - VMware Virtual Ethernet Adapter for VMnet1
+        - VMware Virtual Ethernet Adapter for VMnet8
   datasource:
     platform: mysql
 db:

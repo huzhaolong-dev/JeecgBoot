@@ -9,6 +9,14 @@ server:
       enabled: true
       force: true
 spring:
+  cloud:
+    inetutils:
+      timeout-seconds: 5
+      preferredNetworks:
+        - 192.168.2.*
+      ignored-interfaces:
+        - VMware Virtual Ethernet Adapter for VMnet1
+        - VMware Virtual Ethernet Adapter for VMnet8
   mvc:
     #Spring Boot 2.6+\u540E\u6620\u5C04\u5339\u914D\u7684\u9ED8\u8BA4\u7B56\u7565\u5DF2\u4ECEAntPathMatcher\u66F4\u6539\u4E3APathPatternParser,\u9700\u8981\u624B\u52A8\u6307\u5B9A\u4E3Aant-path-matcher
     pathmatch:
