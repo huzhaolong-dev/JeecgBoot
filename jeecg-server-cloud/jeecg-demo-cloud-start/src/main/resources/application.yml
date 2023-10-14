@@ -5,6 +5,13 @@ spring:
   application:
     name: jeecg-demo
   cloud:
+    inetutils:
+      timeout-seconds: 5
+      preferredNetworks:
+        - 192.168.2.*
+      ignored-interfaces:
+        - VMware Virtual Ethernet Adapter for VMnet1
+        - VMware Virtual Ethernet Adapter for VMnet8
     nacos:
       config:
         server-addr: @config.server-addr@
