@@ -3,25 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>jeecg-boot-parent</artifactId>
+        <artifactId>jeecg-module-sams</artifactId>
         <groupId>org.jeecgframework.boot</groupId>
         <version>3.5.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jeecg-server-cloud</artifactId>
+    <artifactId>jeecg-sams-api</artifactId>
     <packaging>pom</packaging>
-    <name>JEECG SERVER CLOUD</name>
-    
-    <modules>
-        <module>jeecg-cloud-gateway</module>
-        <module>jeecg-cloud-nacos</module>
-        <module>jeecg-system-cloud-start</module>
-        <module>jeecg-demo-cloud-start</module>
-        <module>jeecg-sams-cloud-start</module>
 
-        <!-- 监控和测试例子 -->
-        <module>jeecg-visual</module>
+    <modules>
+        <module>jeecg-sams-local-api</module>
+        <module>jeecg-sams-cloud-api</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jeecgframework.boot</groupId>
+            <artifactId>jeecg-boot-base-core</artifactId>
+        </dependency>
+    </dependencies>
 </project>
