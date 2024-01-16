@@ -167,13 +167,6 @@
 				<version>${jeecgboot.version}</version>
 			</dependency>
 
-			<!-- sams 模块-->
-			<dependency>
-				<groupId>org.jeecgframework.boot</groupId>
-				<artifactId>jeecg-sams-biz</artifactId>
-				<version>${jeecgboot.version}</version>
-			</dependency>
-
 			<!-- jeecg tools -->
 			<dependency>
 				<groupId>org.jeecgframework.boot</groupId>
@@ -196,19 +189,6 @@
 			<dependency>
 				<groupId>org.jeecgframework.boot</groupId>
 				<artifactId>jeecg-system-cloud-api</artifactId>
-				<version>${jeecgboot.version}</version>
-			</dependency>
-
-			<!-- sams 单体 api -->
-			<dependency>
-				<groupId>org.jeecgframework.boot</groupId>
-				<artifactId>jeecg-sams-local-api</artifactId>
-				<version>${jeecgboot.version}</version>
-			</dependency>
-			<!-- sams 微服务 api -->
-			<dependency>
-				<groupId>org.jeecgframework.boot</groupId>
-				<artifactId>jeecg-sams-cloud-api</artifactId>
 				<version>${jeecgboot.version}</version>
 			</dependency>
 

@@ -29,10 +29,11 @@
             <artifactId>jeecg-boot-starter-job</artifactId>
         </dependency>
 
-        <!-- jeecg-system-biz依赖 -->
+        <!-- sams 模块-->
         <dependency>
             <groupId>org.jeecgframework.boot</groupId>
             <artifactId>jeecg-sams-biz</artifactId>
+            <version>${jeecgboot.version}</version>
         </dependency>
     </dependencies>
 
