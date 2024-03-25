@@ -45,6 +45,11 @@
 			<groupId>org.jeecgframework.jimureport</groupId>
 			<artifactId>jimureport-nosql-starter</artifactId>
 		</dependency>-->
+		<dependency>
+			<groupId>com.github.plexpt</groupId>
+			<artifactId>chatgpt</artifactId>
+			<version>4.3.0</version>
+		</dependency>
 	</dependencies>
 	
 </project>
