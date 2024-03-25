@@ -1,4 +1,4 @@
-package org.jeecg.modules.basicData.controller;
+package org.jeecg.modules.openai.controller;
 
 import com.plexpt.chatgpt.entity.chat.Message;
 import io.swagger.annotations.Api;

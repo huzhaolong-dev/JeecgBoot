@@ -1,4 +1,4 @@
-package org.jeecg.modules.basicData.service.openai;
+package org.jeecg.modules.openai.service;
 
 import com.plexpt.chatgpt.ChatGPT;
 import com.plexpt.chatgpt.entity.chat.ChatCompletion;
