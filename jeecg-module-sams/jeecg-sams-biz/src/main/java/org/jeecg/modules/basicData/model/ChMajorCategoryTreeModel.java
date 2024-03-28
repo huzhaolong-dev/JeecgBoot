@@ -41,7 +41,7 @@ public class ChMajorCategoryTreeModel implements Serializable{
     /**名称*/
     private String name;
     /**中国专业分类类型[1-一级专业分类,2-二级专业分类,3-专业]*/
-    private Integer chMajorCategoryType;
+    private String chMajorCategoryType;
     /**父编码号[root-根节点编码号]*/
     private String pcode;
     /**父编码*/
@@ -161,11 +161,11 @@ public class ChMajorCategoryTreeModel implements Serializable{
         this.name = name;
     }
 
-    public Integer getChMajorCategoryType() {
+    public String getChMajorCategoryType() {
         return chMajorCategoryType;
     }
 
-    public void setChMajorCategoryType(Integer chMajorCategoryType) {
+    public void setChMajorCategoryType(String chMajorCategoryType) {
         this.chMajorCategoryType = chMajorCategoryType;
     }
 

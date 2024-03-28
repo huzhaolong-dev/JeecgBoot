@@ -38,7 +38,7 @@ public class ChMajorCategory implements Serializable {
     /**中国专业分类类型[1-一级专业分类,2-二级专业分类,3-专业]*/
     @Dict(dicCode = "ch_major_category_type")
     @Excel(name="中国专业分类类型",width=15)
-    private Integer chMajorCategoryType;
+    private String chMajorCategoryType;
     /**父编码号[root-根节点编码号]*/
     @Excel(name="父编码号",width=15)
     private String pcode;

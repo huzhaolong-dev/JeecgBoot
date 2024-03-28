@@ -45,7 +45,7 @@ import static org.jeecg.modules.basicData.service.IChMajorCategoryService.HAS_NO
  * @Since： 2023-12-30
  */
 @RestController
-@RequestMapping("/basicData/ch_major_category")
+@RequestMapping("/basicData/chMajorCategory")
 @Slf4j
 @Api(tags="中国专业分类")
 public class ChMajorCategoryController {
