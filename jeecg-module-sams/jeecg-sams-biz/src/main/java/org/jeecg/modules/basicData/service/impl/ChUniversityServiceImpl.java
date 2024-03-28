@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 /**
  * @Description: ch_university
  * @Author: jeecg-boot
- * @Date:   2024-03-26
+ * @Date:   2024-03-28
  * @Version: V1.0
  */
 @Service

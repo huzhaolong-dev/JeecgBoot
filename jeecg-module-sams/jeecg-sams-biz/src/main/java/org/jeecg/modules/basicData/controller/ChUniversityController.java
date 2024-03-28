@@ -40,12 +40,12 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  /**
  * @Description: ch_university
  * @Author: jeecg-boot
- * @Date:   2024-03-26
+ * @Date:   2024-03-28
  * @Version: V1.0
  */
 @Api(tags="ch_university")
 @RestController
-@RequestMapping("/basicData/ch_university")
+@RequestMapping("/basicData/chUniversity")
 @Slf4j
 public class ChUniversityController extends JeecgController<ChUniversity, IChUniversityService> {
 	@Autowired

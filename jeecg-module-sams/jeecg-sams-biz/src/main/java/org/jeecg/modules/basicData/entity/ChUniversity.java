@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 /**
  * @Description: ch_university
  * @Author: jeecg-boot
- * @Date:   2024-03-26
+ * @Date:   2024-03-28
  * @Version: V1.0
  */
 @Data
@@ -66,11 +66,13 @@ public class ChUniversity implements Serializable {
     @ApiModelProperty(value = "985学校标志[0-不是,1-是]")
     private Integer nineEightFiveCollegeFlag;
 	/**211学校标志[0-不是,1-是]*/
-	@Excel(name = "211学校标志[0-不是,1-是]", width = 15)
+	@Excel(name = "211学校标志[0-不是,1-是]", width = 15, dicCode = "two_eleven_college_flag")
+	@Dict(dicCode = "two_eleven_college_flag")
     @ApiModelProperty(value = "211学校标志[0-不是,1-是]")
     private Integer twoElevenCollegeFlag;
 	/**双一流学校标志[0-不是,1-是]*/
-	@Excel(name = "双一流学校标志[0-不是,1-是]", width = 15)
+	@Excel(name = "双一流学校标志[0-不是,1-是]", width = 15, dicCode = "double_first_class_college_flag")
+	@Dict(dicCode = "double_first_class_college_flag")
     @ApiModelProperty(value = "双一流学校标志[0-不是,1-是]")
     private Integer doubleFirstClassCollegeFlag;
 	/**QS世界排名*/
