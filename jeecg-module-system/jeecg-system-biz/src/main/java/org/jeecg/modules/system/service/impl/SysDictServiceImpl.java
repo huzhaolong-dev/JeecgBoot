@@ -1,6 +1,7 @@
 package org.jeecg.modules.system.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,12 +14,14 @@ import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.constant.DataBaseConstant;
 import org.jeecg.common.constant.SymbolConstant;
 import org.jeecg.common.exception.JeecgBootException;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.ResourceUtil;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.DictModelMany;
 import org.jeecg.common.system.vo.DictQuery;
 import org.jeecg.common.util.CommonUtils;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SqlInjectionUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
@@ -35,6 +38,7 @@ import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -61,6 +65,13 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	@Autowired
 	private DictQueryBlackListHandler dictQueryBlackListHandler;
 
+	@Lazy
+	@Autowired
+	private ISysBaseAPI sysBaseAPI;
+	@Lazy
+	@Autowired
+	private RedisUtil redisUtil;
+
 	@Override
 	public boolean duplicateCheckData(DuplicateCheckVo duplicateCheckVo) {
 		Long count = null;
@@ -74,9 +85,11 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		// 2.SQL注入check（只限制非法串改数据库）
 		//关联表字典（举例：sys_user,realname,id）
 		SqlInjectionUtil.filterContent(table, fieldName);
-		
-		// 3.表字典黑名单check
+
 		String checkSql = table + SymbolConstant.COMMA + fieldName + SymbolConstant.COMMA;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, fieldName);
+		// 3.表字典黑名单check
 		dictQueryBlackListHandler.isPass(checkSql);
 
 		// 4.执行SQL 查询是否存在值
@@ -131,45 +144,48 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		Map<String, List<DictModel>> dictMap = new HashMap(5);
 		for (DictModelMany dict : list) {
 			List<DictModel> dictItemList = dictMap.computeIfAbsent(dict.getDictCode(), i -> new ArrayList<>());
-			dict.setDictCode(null);
-			dictItemList.add(new DictModel(dict.getValue(), dict.getText()));
+			
+			//update-begin-author:taoyan date:2023-4-28 for: QQYUN-5183【简流】多字段拼接-多选框、下拉框 等需要翻译的字段
+			//dict.setDictCode(null);
+			//update-end-author:taoyan date:2023-4-28 for: QQYUN-5183【简流】多字段拼接-多选框、下拉框 等需要翻译的字段
+			
+			dictItemList.add(new DictModel(dict.getValue(), dict.getText(), dict.getColor()));
 		}
 		return dictMap;
 	}
 
 	@Override
 	public Map<String, List<DictModel>> queryAllDictItems() {
-		Map<String, List<DictModel>> res = new HashMap(5);
-		LambdaQueryWrapper<SysDict> sysDictQueryWrapper = new LambdaQueryWrapper<SysDict>();
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		long start = System.currentTimeMillis();
+		Map<String, List<DictModel>> sysAllDictItems = new HashMap(5);
+		List<Integer> tenantIds = null;
 		//------------------------------------------------------------------------------------------------
 		//是否开启系统管理模块的多租户数据隔离【SAAS多租户模式】
-		if(MybatisPlusSaasConfig.OPEN_SYSTEM_TENANT_CONTROL){
-			sysDictQueryWrapper.eq(SysDict::getTenantId, oConvertUtils.getInt(TenantContext.getTenant(), 0))
-					.or().eq(SysDict::getTenantId,0);
+		if (MybatisPlusSaasConfig.OPEN_SYSTEM_TENANT_CONTROL) {
+			tenantIds = new ArrayList<>();
+			tenantIds.add(0);
+			if (TenantContext.getTenant() != null) {
+				tenantIds.add(oConvertUtils.getInt(TenantContext.getTenant()));
+			}
 		}
 		//------------------------------------------------------------------------------------------------
-		
-		List<SysDict> ls = sysDictMapper.selectList(sysDictQueryWrapper);
-		LambdaQueryWrapper<SysDictItem> queryWrapper = new LambdaQueryWrapper<SysDictItem>();
-		queryWrapper.eq(SysDictItem::getStatus, 1);
-		queryWrapper.orderByAsc(SysDictItem::getSortOrder);
-		List<SysDictItem> sysDictItemList = sysDictItemMapper.selectList(queryWrapper);
+		List<DictModelMany> sysDictItemList = sysDictMapper.queryAllDictItems(tenantIds);
+		// 使用groupingBy根据dictCode分组
+		sysAllDictItems = sysDictItemList.stream()
+				.collect(Collectors.groupingBy(DictModelMany::getDictCode,
+						Collectors.mapping(d -> new DictModel(d.getValue(), d.getText(), d.getColor()), Collectors.toList())));
+		log.info("      >>> 1 获取系统字典项耗时（SQL）：" + (System.currentTimeMillis() - start) + "毫秒");
 
-		for (SysDict d : ls) {
-			List<DictModel> dictModelList = sysDictItemList.stream().filter(s -> d.getId().equals(s.getDictId())).map(item -> {
-				DictModel dictModel = new DictModel();
-				dictModel.setText(item.getItemText());
-				dictModel.setValue(item.getItemValue());
-				return dictModel;
-			}).collect(Collectors.toList());
-			res.put(d.getDictCode(), dictModelList);
-		}
-		//update-begin-author:taoyan date:2022-7-8 for: 系统字典数据应该包括自定义的java类-枚举
 		Map<String, List<DictModel>> enumRes = ResourceUtil.getEnumDictData();
-		res.putAll(enumRes);
-		//update-end-author:taoyan date:2022-7-8 for: 系统字典数据应该包括自定义的java类-枚举
-		log.debug("-------登录加载系统字典-----" + res.toString());
-		return res;
+		sysAllDictItems.putAll(enumRes);
+		log.info("      >>> 2 获取系统字典项耗时（Enum）：" + (System.currentTimeMillis() - start) + "毫秒");
+		
+		log.info("      >>> end 获取系统字典库总耗时：" + (System.currentTimeMillis() - start) + "毫秒");
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+		//log.info("-------登录加载系统字典-----" + sysAllDictItems.toString());
+		return sysAllDictItems;
 	}
 
 	/**
@@ -213,9 +229,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	@Deprecated
 	public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code) {
 		log.debug("无缓存dictTableList的时候调用这里！");
-
-		// 1.表字典黑名单check
 		String str = tableFilterSql+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(tableFilterSql, text, code);
+		// 1.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(str)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -254,8 +271,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		SqlInjectionUtil.filterContent(text, code);
 		SqlInjectionUtil.specialFilterContentForDictSql(filterSql);
 		
-		// 2.表字典黑名单 Check
 		String str = table+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+		// 2.表字典黑名单 Check
 		if(!dictQueryBlackListHandler.isPass(str)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -283,8 +302,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	public String queryTableDictTextByKey(String table,String text,String code, String key) {
 		log.debug("无缓存dictTable的时候调用这里！");
 		
-		// 1.表字典黑名单check
 		String str = table+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+		// 1.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(str)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -309,13 +330,22 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	}
 
 	@Override
-	public List<DictModel> queryTableDictTextByKeys(String table, String text, String code, List<String> codeValues) {
-		// 1.表字典黑名单check
+	public List<DictModel> queryTableDictTextByKeys(String table, String text, String code, List<String> codeValues, String dataSource) {
 		String str = table+","+text+","+code;
-		if(!dictQueryBlackListHandler.isPass(str)){
-			log.error(dictQueryBlackListHandler.getError());
-			return null;
+		//update-begin---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
+		// 是否自定义数据源
+		boolean isCustomDataSource = oConvertUtils.isNotEmpty(dataSource);
+		// 如果是自定义数据源就不检查表字典白名单
+		if (!isCustomDataSource) {
+			// 【QQYUN-6533】表字典白名单check
+			sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+			// 1.表字典黑名单check
+			if (!dictQueryBlackListHandler.isPass(str)) {
+				log.error(dictQueryBlackListHandler.getError());
+				return null;
+			}
 		}
+		//update-end---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
 
 		// 2.分割SQL获取表名和条件
 		String filterSql = null;
@@ -333,14 +363,28 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		table = SqlInjectionUtil.getSqlInjectTableName(table);
 		text = SqlInjectionUtil.getSqlInjectField(text);
 		code = SqlInjectionUtil.getSqlInjectField(code);
-		
-		return sysDictMapper.queryTableDictByKeysAndFilterSql(table, text, code, filterSql, codeValues);
+
+		//update-begin---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
+        // 切换为字典表的数据源
+        if (isCustomDataSource) {
+            DynamicDataSourceContextHolder.push(dataSource);
+        }
+		List<DictModel> restData = sysDictMapper.queryTableDictByKeysAndFilterSql(table, text, code, filterSql, codeValues);
+		// 清理自定义的数据源
+		if (isCustomDataSource) {
+			DynamicDataSourceContextHolder.clear();
+		}
+		return restData;
+		//update-end---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
 		//update-end-author:taoyan date:20220113 for: @dict注解支持 dicttable 设置where条件
 	}
 
 	@Override
 	public List<String> queryTableDictByKeys(String table, String text, String code, String keys) {
 		String str = table+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+		// 1.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(str)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -377,8 +421,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		SqlInjectionUtil.filterContent(table, text, code);
 		SqlInjectionUtil.specialFilterContentForDictSql(filterSql);
 
-		// 3.表字典黑名单check
 		String str = table+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+		// 3.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(str)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -488,10 +534,12 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		String filterSql = "";
 		String keywordSql = null;
 		String sqlWhere = "where ";
+		String sqlAnd = " and ";
 		
 		//【JTC-631】判断如果 table 携带了 where 条件，那么就使用 and 查询，防止报错
-        if (tableSql.toLowerCase().contains(sqlWhere)) {
-            sqlWhere = CommonUtils.getFilterSqlByTableSql(tableSql) + " and ";
+		boolean tableHasWhere = tableSql.toLowerCase().contains(sqlWhere);
+        if (tableHasWhere) {
+			sqlWhere = CommonUtils.getFilterSqlByTableSql(tableSql);
 		}
 
 		// 下拉搜索组件 支持传入排序信息 查询排序
@@ -521,14 +569,17 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		}
 		
 		//下拉搜索组件 支持传入排序信息 查询排序
-		if(oConvertUtils.isNotEmpty(condition) && oConvertUtils.isNotEmpty(keywordSql)){
-			filterSql+= sqlWhere + condition + " and " + keywordSql;
-		}else if(oConvertUtils.isNotEmpty(condition)){
-			filterSql+= sqlWhere + condition;
-		}else if(oConvertUtils.isNotEmpty(keywordSql)){
-			filterSql+= sqlWhere + keywordSql;
-		}
-		
+		//update-begin---author:chenrui ---date:20240327  for：[QQYUN-8514]Online表单中 下拉搜索框 搜索时报sql错误，生成的SQL多了一个 “and" ------------
+        if (oConvertUtils.isNotEmpty(condition) && oConvertUtils.isNotEmpty(keywordSql)) {
+            filterSql += sqlWhere + (tableHasWhere ? sqlAnd : " ") + condition + sqlAnd + keywordSql;
+        } else if (oConvertUtils.isNotEmpty(condition)) {
+            filterSql += sqlWhere + (tableHasWhere ? sqlAnd : " ") + condition;
+        } else if (oConvertUtils.isNotEmpty(keywordSql)) {
+            filterSql += sqlWhere + (tableHasWhere ? sqlAnd : " ") + keywordSql;
+        } else if (tableHasWhere) {
+            filterSql += sqlWhere;
+        }
+		//update-end---author:chenrui ---date:20240327  for：[QQYUN-8514]Online表单中 下拉搜索框 搜索时报sql错误，生成的SQL多了一个 “and" ------------
 		// 增加排序逻辑
 		if (oConvertUtils.isNotEmpty(orderField)) {
 			filterSql += " order by " + orderField + " " + orderType;
@@ -577,6 +628,8 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		String dictCode = table + "," + text + "," + code;
 		SqlInjectionUtil.filterContent(dictCode);
 
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
 		// 3.表字典SQL表名黑名单 Check
 		if(!dictQueryBlackListHandler.isPass(dictCode)){
 			log.error("Sql异常：{}", dictQueryBlackListHandler.getError());
@@ -607,7 +660,15 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	}
 
 	@Override
-	public List<SysDict> queryDeleteList() {
+	public List<SysDict> queryDeleteList(String tenantId) {
+		//update-begin---author:wangshuai---date:2024-02-27---for:【QQYUN-8340】回收站查找软删除记录时，没有判断是否启用多租户，造成可以查找并回收其他租户的数据 #5907---
+		if(MybatisPlusSaasConfig.OPEN_SYSTEM_TENANT_CONTROL){
+			if(oConvertUtils.isEmpty(tenantId)){
+				return new ArrayList<>();
+			}
+			return baseMapper.queryDeleteListBtTenantId(oConvertUtils.getInt(tenantId));
+		}
+		//update-end---author:wangshuai---date:2024-02-27---for:【QQYUN-8340】回收站查找软删除记录时，没有判断是否启用多租户，造成可以查找并回收其他租户的数据 #5907---
 		return baseMapper.queryDeleteList();
 	}
 
@@ -624,8 +685,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		query.setTable(text);
 		query.setText(code);
 		
-		// 2.表字典黑名单check
 		String dictCode = table+","+text+","+code;
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(table, text, code);
+		// 2.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(dictCode)){
 			log.error(dictQueryBlackListHandler.getError());
 			return null;
@@ -674,6 +737,8 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
 	@Override
 	public List<DictModel> loadDict(String dictCode, String keyword, Integer pageSize) {
+		// 【QQYUN-6533】表字典白名单check
+		sysBaseAPI.dictTableWhiteListCheckByDict(dictCode);
 		// 1.表字典黑名单check
 		if(!dictQueryBlackListHandler.isPass(dictCode)){
 			log.error(dictQueryBlackListHandler.getError());
@@ -734,9 +799,12 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	}
 
 	@Override
-	public void addDictByLowAppId(SysDictVo sysDictVo) {
-		String id = this.addDict(sysDictVo.getDictName(),sysDictVo.getLowAppId());
+	public String addDictByLowAppId(SysDictVo sysDictVo) {
+		String[] dictResult = this.addDict(sysDictVo.getDictName(),sysDictVo.getLowAppId(),sysDictVo.getTenantId());
+		String id = dictResult[0];
+		String code = dictResult[1];
 		this.addDictItem(id,sysDictVo.getDictItemsList());
+		return code;
 	}
 
 	@Override
@@ -755,20 +823,24 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		sysDict.setId(id);
 		baseMapper.updateById(sysDict);
 		this.updateDictItem(id,sysDictVo.getDictItemsList());
+		// 删除字典缓存
+		redisUtil.removeAll(CacheConstant.SYS_DICT_CACHE + "::" + dict.getDictCode());
 	}
 
 	/**
 	 * 添加字典
 	 * @param dictName
 	 */
-	private String addDict(String dictName,String lowAppId) {
+	private String[] addDict(String dictName,String lowAppId, Integer tenantId) {
 		SysDict dict = new SysDict();
 		dict.setDictName(dictName);
 		dict.setDictCode(RandomUtil.randomString(10));
 		dict.setDelFlag(Integer.valueOf(CommonConstant.STATUS_0));
 		dict.setLowAppId(lowAppId);
+		dict.setTenantId(tenantId);
 		baseMapper.insert(dict);
-		return dict.getId();
+		String[] dictResult = new String[]{dict.getId(), dict.getDictCode()};
+		return dictResult;
 	}
 
 	/**

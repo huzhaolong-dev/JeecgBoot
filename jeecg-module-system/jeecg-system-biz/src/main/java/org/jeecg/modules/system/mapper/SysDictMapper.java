@@ -67,17 +67,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	public List<DictModelMany> queryDictItemsByCodeList(@Param("dictCodeList") List<String> dictCodeList);
 
     /**
-     * 通过查询指定table的 text code 获取字典
-     * @param table
-     * @param key
-     * @param value
-     * @return List<Map<String,String>>
-     */
-	@Deprecated
-	@Select("select ${key} as \"label\",${value} as \"value\" from ${table}")
-	public List<Map<String,String>> getDictByTableNgAlain(@Param("table") String table, @Param("key") String key, @Param("value") String value);
-
-    /**
      * 通过字典code获取字典数据
      * @param code
      * @param key
@@ -93,6 +82,12 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 */
 	List<DictModelMany> queryManyDictByKeys(@Param("dictCodeList") List<String> dictCodeList, @Param("keys") List<String> keys);
 
+	/**
+	 * 查询系统所有字典项
+	 * @return
+	 */
+	public List<DictModelMany> queryAllDictItems(List<Integer> tenantIdList);
+	
 	/**
 	 * 查询所有部门 作为字典信息 id -->value,departName -->text
 	 * @return
@@ -117,7 +112,9 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	List<TreeSelectModel> queryTreeList(@Param("query") Map<String, String> query, @Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("pidField") String pidField, @Param("pid") String pid, @Param("hasChildField") String hasChildField, @Param("converIsLeafVal") int converIsLeafVal);
+	List<TreeSelectModel> queryTreeList(@Param("query") Map<String, String> query, @Param("table") String table, @Param("text") String text, @Param("code") String code,
+										@Param("pidField") String pidField, @Param("pid") String pid, @Param("hasChildField") String hasChildField,
+										@Param("converIsLeafVal") int converIsLeafVal);
 
 	/**
 	 * 删除
@@ -185,8 +182,8 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	List<DictModel> queryTableDictByKeysAndFilterSql(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("filterSql") String filterSql,
-                                                     @Param("codeValues") List<String> codeValues);
+	List<DictModel> queryTableDictByKeysAndFilterSql(@Param("table") String table, @Param("text") String text, @Param("code") String code, @Param("filterSql") String filterSql,  
+													 @Param("codeValues") List<String> codeValues);
 
 	/**
 	 * 根据应用id获取字典列表和详情
@@ -196,4 +193,11 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 */
 	@InterceptorIgnore(tenantLine = "true")
     List<SysDict> getDictListByLowAppId(@Param("lowAppId") String lowAppId, @Param("tenantId") Integer tenantId);
+
+	/**
+	 * 查询被逻辑删除的数据（根据租户id）
+	 * @return
+	 */
+	@Select("select * from sys_dict where del_flag = 1 and tenant_id = #{tenantId}")
+	List<SysDict> queryDeleteListBtTenantId(@Param("tenantId") Integer tenantId);
 }

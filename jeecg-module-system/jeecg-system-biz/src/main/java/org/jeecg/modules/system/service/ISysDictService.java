@@ -107,6 +107,7 @@ public interface ISysDictService extends IService<SysDict> {
     @Deprecated
 	String queryTableDictTextByKey(String table, String text, String code, String key);
 
+	//update-begin---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
 	/**
 	 * 通过查询指定table的 text code key 获取字典值，可批量查询
 	 *
@@ -114,9 +115,11 @@ public interface ISysDictService extends IService<SysDict> {
 	 * @param text
 	 * @param code
 	 * @param keys
+	 * @param dataSource 数据源
 	 * @return
 	 */
-	List<DictModel> queryTableDictTextByKeys(String table, String text, String code, List<String> keys);
+	List<DictModel> queryTableDictTextByKeys(String table, String text, String code, List<String> keys, String dataSource);
+	//update-end---author:chenrui ---date:20231221  for：[issues/#5643]解决分布式下表字典跨库无法查询问题------------
 
     /**
      * 通过查询指定table的 text code key 获取字典值，包含value
@@ -216,7 +219,7 @@ public interface ISysDictService extends IService<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	List<TreeSelectModel> queryTreeList(Map<String, String> query, String table, String text, String code, String pidField, String pid, String hasChildField, int converIsLeafVal);
+	List<TreeSelectModel> queryTreeList(Map<String, String> query,String table, String text, String code, String pidField,String pid,String hasChildField,int converIsLeafVal);
 
 	/**
 	 * 真实删除
@@ -235,7 +238,7 @@ public interface ISysDictService extends IService<SysDict> {
 	 * 查询被逻辑删除的数据
 	 * @return
 	 */
-	public List<SysDict> queryDeleteList();
+	public List<SysDict> queryDeleteList(String tenantId);
 
 	/**
 	 * 分页查询
@@ -245,7 +248,7 @@ public interface ISysDictService extends IService<SysDict> {
 	 * @return
 	 */
 	@Deprecated
-	public List<DictModel> queryDictTablePageList(DictQuery query, int pageSize, int pageNo);
+	public List<DictModel> queryDictTablePageList(DictQuery query,int pageSize, int pageNo);
 
     /**
      * 获取字典数据
@@ -277,7 +280,7 @@ public interface ISysDictService extends IService<SysDict> {
 	 * 创建字典
 	 * @param sysDictVo
 	 */
-	void addDictByLowAppId(SysDictVo sysDictVo);
+	String addDictByLowAppId(SysDictVo sysDictVo);
 
 	/**
 	 * 编辑字典
