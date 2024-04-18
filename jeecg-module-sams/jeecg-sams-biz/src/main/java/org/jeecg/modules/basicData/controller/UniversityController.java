@@ -15,7 +15,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.basicData.entity.ChUniversity;
-import org.jeecg.modules.basicData.service.IChUniversityService;
+import org.jeecg.modules.basicData.entity.University;
+import org.jeecg.modules.basicData.service.IUniversityService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -40,72 +41,72 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
  /**
- * @Description: ch_university
+ * @Description: university
  * @Author: jeecg-boot
- * @Date:   2024-03-28
+ * @Date:   2024-04-17
  * @Version: V1.0
  */
-@Api(tags="ch_university")
+@Api(tags="university")
 @RestController
-@RequestMapping("/basicData/chUniversity")
+@RequestMapping("/basicData/university")
 @Slf4j
-public class ChUniversityController extends JeecgController<ChUniversity, IChUniversityService> {
+public class UniversityController extends JeecgController<University, IUniversityService> {
 	@Autowired
-	private IChUniversityService chUniversityService;
+	private IUniversityService universityService;
 	
 	/**
 	 * 分页列表查询
 	 *
-	 * @param chUniversity
+	 * @param university
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
-	//@AutoLog(value = "ch_university-分页列表查询")
-	@ApiOperation(value="ch_university-分页列表查询", notes="ch_university-分页列表查询")
+	//@AutoLog(value = "university-分页列表查询")
+	@ApiOperation(value="university-分页列表查询", notes="university-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<ChUniversity>> queryPageList(ChUniversity chUniversity,
+	public Result<IPage<University>> queryPageList(University university,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-		QueryWrapper<ChUniversity> queryWrapper = new QueryWrapper<>();
-		String name = chUniversity.getName();
+		QueryWrapper<University> queryWrapper = new QueryWrapper<>();
+		String name = university.getName();
 		if (StringUtils.isNotBlank(name)) {
 			queryWrapper.like("name", name).or().like("ch_name", name);
 		}
-		Page<ChUniversity> page = new Page<ChUniversity>(pageNo, pageSize);
-		IPage<ChUniversity> pageList = chUniversityService.page(page, queryWrapper);
+		Page<University> page = new Page<University>(pageNo, pageSize);
+		IPage<University> pageList = universityService.page(page, queryWrapper);
 		return Result.OK(pageList);
 	}
 	
 	/**
 	 *   添加
 	 *
-	 * @param chUniversity
+	 * @param university
 	 * @return
 	 */
-	@AutoLog(value = "ch_university-添加")
-	@ApiOperation(value="ch_university-添加", notes="ch_university-添加")
-	@RequiresPermissions("basicData:ch_university:add")
+	@AutoLog(value = "university-添加")
+	@ApiOperation(value="university-添加", notes="university-添加")
+	@RequiresPermissions("basicData:university:add")
 	@PostMapping(value = "/add")
-	public Result<String> add(@RequestBody ChUniversity chUniversity) {
-		chUniversityService.save(chUniversity);
+	public Result<String> add(@RequestBody University university) {
+		universityService.save(university);
 		return Result.OK("添加成功！");
 	}
 	
 	/**
 	 *  编辑
 	 *
-	 * @param chUniversity
+	 * @param university
 	 * @return
 	 */
-	@AutoLog(value = "ch_university-编辑")
-	@ApiOperation(value="ch_university-编辑", notes="ch_university-编辑")
-	@RequiresPermissions("basicData:ch_university:edit")
+	@AutoLog(value = "university-编辑")
+	@ApiOperation(value="university-编辑", notes="university-编辑")
+	@RequiresPermissions("basicData:university:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
-	public Result<String> edit(@RequestBody ChUniversity chUniversity) {
-		chUniversityService.updateById(chUniversity);
+	public Result<String> edit(@RequestBody University university) {
+		universityService.updateById(university);
 		return Result.OK("编辑成功!");
 	}
 	
@@ -115,12 +116,12 @@ public class ChUniversityController extends JeecgController<ChUniversity, IChUni
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "ch_university-通过id删除")
-	@ApiOperation(value="ch_university-通过id删除", notes="ch_university-通过id删除")
-	@RequiresPermissions("basicData:ch_university:delete")
+	@AutoLog(value = "university-通过id删除")
+	@ApiOperation(value="university-通过id删除", notes="university-通过id删除")
+	@RequiresPermissions("basicData:university:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		chUniversityService.removeById(id);
+		universityService.removeById(id);
 		return Result.OK("删除成功!");
 	}
 	
@@ -130,12 +131,12 @@ public class ChUniversityController extends JeecgController<ChUniversity, IChUni
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "ch_university-批量删除")
-	@ApiOperation(value="ch_university-批量删除", notes="ch_university-批量删除")
-	@RequiresPermissions("basicData:ch_university:deleteBatch")
+	@AutoLog(value = "university-批量删除")
+	@ApiOperation(value="university-批量删除", notes="university-批量删除")
+	@RequiresPermissions("basicData:university:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.chUniversityService.removeByIds(Arrays.asList(ids.split(",")));
+		this.universityService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
 	
@@ -145,27 +146,27 @@ public class ChUniversityController extends JeecgController<ChUniversity, IChUni
 	 * @param id
 	 * @return
 	 */
-	//@AutoLog(value = "ch_university-通过id查询")
-	@ApiOperation(value="ch_university-通过id查询", notes="ch_university-通过id查询")
+	//@AutoLog(value = "university-通过id查询")
+	@ApiOperation(value="university-通过id查询", notes="university-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<ChUniversity> queryById(@RequestParam(name="id",required=true) String id) {
-		ChUniversity chUniversity = chUniversityService.getById(id);
-		if(chUniversity==null) {
+	public Result<University> queryById(@RequestParam(name="id",required=true) String id) {
+		University university = universityService.getById(id);
+		if(university==null) {
 			return Result.error("未找到对应数据");
 		}
-		return Result.OK(chUniversity);
+		return Result.OK(university);
 	}
 
     /**
     * 导出excel
     *
     * @param request
-    * @param chUniversity
+    * @param university
     */
-    @RequiresPermissions("basicData:ch_university:exportXls")
+    @RequiresPermissions("basicData:university:exportXls")
     @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, ChUniversity chUniversity) {
-        return super.exportXls(request, chUniversity, ChUniversity.class, "ch_university");
+    public ModelAndView exportXls(HttpServletRequest request, University university) {
+        return super.exportXls(request, university, University.class, "university");
     }
 
     /**
@@ -175,10 +176,10 @@ public class ChUniversityController extends JeecgController<ChUniversity, IChUni
     * @param response
     * @return
     */
-    @RequiresPermissions("basicData:ch_university:importExcel")
+    @RequiresPermissions("basicData:university:importExcel")
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-        return super.importExcel(request, response, ChUniversity.class);
+        return super.importExcel(request, response, University.class);
     }
 
 }

@@ -19,17 +19,17 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * @Description: ch_university
+ * @Description: university
  * @Author: jeecg-boot
- * @Date:   2024-03-28
+ * @Date:   2024-04-17
  * @Version: V1.0
  */
 @Data
-@TableName("ch_university")
+@TableName("university")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="ch_university对象", description="ch_university")
-public class ChUniversity implements Serializable {
+@ApiModel(value="university对象", description="university")
+public class University implements Serializable {
     private static final long serialVersionUID = 1L;
 
 	/**主键ID*/
@@ -52,7 +52,7 @@ public class ChUniversity implements Serializable {
     @Excel(name = "国家编码", width = 15, dictTable = "country", dicText = "name", dicCode = "code")
     @Dict(dictTable = "country", dicText = "name", dicCode = "code")
     @ApiModelProperty(value = "国家编码")
-    private java.lang.String countryCode;
+    private String countryCode;
 	/**图片Url地址*/
 	@Excel(name = "图片Url地址", width = 15)
     @ApiModelProperty(value = "图片Url地址")
@@ -61,21 +61,6 @@ public class ChUniversity implements Serializable {
 	@Excel(name = "网站Url地址", width = 15)
     @ApiModelProperty(value = "网站Url地址")
     private String webUrl;
-	/**985学校标志[0-不是,1-是]*/
-	@Excel(name = "985学校标志[0-不是,1-是]", width = 15, dicCode = "nine_eight_five_college_flag")
-	@Dict(dicCode = "nine_eight_five_college_flag")
-    @ApiModelProperty(value = "985学校标志[0-不是,1-是]")
-    private String nineEightFiveCollegeFlag;
-	/**211学校标志[0-不是,1-是]*/
-	@Excel(name = "211学校标志[0-不是,1-是]", width = 15, dicCode = "two_eleven_college_flag")
-	@Dict(dicCode = "two_eleven_college_flag")
-    @ApiModelProperty(value = "211学校标志[0-不是,1-是]")
-    private String twoElevenCollegeFlag;
-	/**双一流学校标志[0-不是,1-是]*/
-	@Excel(name = "双一流学校标志[0-不是,1-是]", width = 15, dicCode = "double_first_class_college_flag")
-	@Dict(dicCode = "double_first_class_college_flag")
-    @ApiModelProperty(value = "双一流学校标志[0-不是,1-是]")
-    private String doubleFirstClassCollegeFlag;
 	/**QS世界排名*/
 	@Excel(name = "QS世界排名", width = 15)
     @ApiModelProperty(value = "QS世界排名")
