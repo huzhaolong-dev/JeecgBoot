@@ -1,5 +1,6 @@
 package org.jeecg.modules.businessProcess.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.basicData.entity.University;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -612,7 +614,11 @@ public class StudentController extends JeecgController<Student, IStudentService>
                                                     @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                     HttpServletRequest req) {
-        QueryWrapper<StudentMaterial> queryWrapper = QueryGenerator.initQueryWrapper(studentMaterial, req.getParameterMap());
+		QueryWrapper<StudentMaterial> queryWrapper = new QueryWrapper<>();
+		String name = studentMaterial.getName();
+		if (StringUtils.isNotBlank(name)) {
+			queryWrapper.like("name", name);
+		}
         Page<StudentMaterial> page = new Page<StudentMaterial>(pageNo, pageSize);
         IPage<StudentMaterial> pageList = studentMaterialService.page(page, queryWrapper);
         return Result.OK(pageList);
