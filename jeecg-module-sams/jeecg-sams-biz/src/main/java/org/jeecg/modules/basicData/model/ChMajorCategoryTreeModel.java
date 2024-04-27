@@ -79,7 +79,7 @@ public class ChMajorCategoryTreeModel implements Serializable{
      * @param chMajorCategory
      */
 	public ChMajorCategoryTreeModel(ChMajorCategory chMajorCategory) {
-		this.key = chMajorCategory.getId();
+		this.key = chMajorCategory.getCode();
         this.value = chMajorCategory.getCode();
         this.title = chMajorCategory.getName();
         this.id = chMajorCategory.getId();
