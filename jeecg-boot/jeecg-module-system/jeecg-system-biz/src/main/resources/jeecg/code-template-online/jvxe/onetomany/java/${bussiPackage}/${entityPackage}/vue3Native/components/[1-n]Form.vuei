@@ -12,6 +12,7 @@
 <#assign need_dept = false>
 <#assign need_multi = false>
 <#assign need_popup = false>
+<#assign need_popup_dict = false>
 <#assign need_select_tag = false>
 <#assign need_select_tree = false>
 <#assign need_time = false>
@@ -20,6 +21,7 @@
 <#assign need_image_upload = false>
 <#assign need_editor = false>
 <#assign need_checkbox = false>
+<#assign need_range_number = false>
 <#assign form_span = 24>
 <#if tableVo.fieldRowNum==2>
   <#assign form_span = 12>
@@ -31,19 +33,24 @@
   <#assign hasOnlyValidate = false>
 <template>
   <a-spin :spinning="loading">
-    <a-form v-bind="formItemLayout">
-      <a-row>
-        <#list sub.colums as po>
-          <#if po.isShow == 'Y' && po.fieldValidType?default("") == 'only'>
-            <#assign hasOnlyValidate = true>
-          </#if>
-          <#if po.fieldDbName=='bpm_status'>
-            <#assign bpm_flag=true>
-          </#if>
-          <#include "/common/form/native/vue3NativeForm.ftl">
-        </#list>
-      </a-row>
-    </a-form>
+    <JFormContainer :disabled="disabled">
+      <template #detail>
+        <a-form v-bind="formItemLayout" name="${sub.entityName}Form" ref="formRef" class="antd-modal-form">
+          <a-row>
+            <#list sub.colums as po>
+              <#if po.isShow == 'Y' && po.fieldValidType?default("") == 'only'>
+                <#assign hasOnlyValidate = true>
+              </#if>
+              <#if po.fieldDbName=='bpm_status'>
+                <#assign bpm_flag=true>
+              </#if>
+              <#assign formEntityName>${sub.entityName}Form</#assign>
+              <#include "/common/form/native/vue3NativeForm.ftl">
+            </#list>
+          </a-row>
+        </a-form>
+      </template>
+    </JFormContainer>
   </a-spin>
 </template>
 
@@ -55,6 +62,7 @@
   import { duplicateValidate } from '/@/utils/helper/validator'
 </#if>
   import { useMessage } from '/@/hooks/web/useMessage';
+  import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';  
   import { Form } from 'ant-design-vue';
   const useForm = Form.useForm;
 
@@ -62,6 +70,7 @@
     name: '${sub.entityName}Form',
     components:{
     <#include "/common/form/native/vue3NativeComponents.ftl">
+    JFormContainer,
     },
     props:{
       disabled:{
@@ -73,6 +82,7 @@
       const { createMessage } = useMessage();
       const isForm = true;
       const loading = ref(false);
+      const formRef = ref();
       const formData = reactive<Record<string, any>>({
         id: '',
         <#include "/common/init/native/vue3NativeSubInitValue.ftl">
@@ -110,7 +120,18 @@
       }
 
       async function getFormData() {
-        await validate();
+        try {
+          // 触发表单验证
+          await validate();
+        } catch ({ errorFields }) {
+          if (errorFields) {
+            const firstField = errorFields[0];
+            if (firstField) {
+              formRef.value.scrollToField(firstField.name, { behavior: 'smooth', block: 'center' });
+            }
+          }
+          return Promise.reject(errorFields);
+        }
         let subFormData = toRaw(formData);
         if(Object.keys(subFormData).length>0){
           return subFormData
@@ -152,10 +173,17 @@
         setFieldsValue,
         handleFormChange,
         isForm,
-        validateInfos
+        validateInfos,
+        formRef,
       }
     }
   });
 </script>
+<style lang="less" scoped>
+  .antd-modal-form {
+    max-height: 340px;
+    overflow: auto;
+  }
+</style>
 </#if>
 </#list>

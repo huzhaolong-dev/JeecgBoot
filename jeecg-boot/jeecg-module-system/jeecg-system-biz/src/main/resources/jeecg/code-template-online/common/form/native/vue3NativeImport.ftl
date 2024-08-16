@@ -13,6 +13,9 @@
 <#if need_popup>
   import JPopup from '/@/components/Form/src/jeecg/components/JPopup.vue';
 </#if>
+<#if need_popup_dict>
+  import JPopupDict from '/@/components/Form/src/jeecg/components/JPopupDict.vue';
+</#if>
 <#if need_category>
   import JCategorySelect from '/@/components/Form/src/jeecg/components/JCategorySelect.vue';
 </#if>
@@ -31,7 +34,7 @@
   import { TimePicker } from 'ant-design-vue';
 </#if>
 <#if need_pca>
-  import JAreaSelect from '/@/components/Form/src/jeecg/components/JAreaSelect.vue';
+  import JAreaLinkage from '/@/components/Form/src/jeecg/components/JAreaLinkage.vue';
 </#if>
 <#if need_upload>
   import JUpload from '/@/components/Form/src/jeecg/components/JUpload/JUpload.vue';
@@ -47,4 +50,7 @@
 </#if>
 <#if need_checkbox>
   import JCheckbox from "/@/components/Form/src/jeecg/components/JCheckbox.vue";
+</#if>
+<#if need_range_number>
+  import JRangeNumber from "/@/components/Form/src/jeecg/components/JRangeNumber.vue";
 </#if>
