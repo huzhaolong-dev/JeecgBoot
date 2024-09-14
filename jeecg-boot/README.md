@@ -2,12 +2,12 @@
 JeecgBoot 低代码开发平台
 ===============
 
-当前最新版本： 3.7.0_all（发布日期：2024-06-23） 
+当前最新版本： 3.7.1（发布日期：2024-09-12） 
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE)
 [![](https://img.shields.io/badge/Author-北京国炬软件-orange.svg)](http://jeecg.com/aboutusIndex)
-[![](https://img.shields.io/badge/version-3.7.0_all-brightgreen.svg)](https://github.com/zhangdaiscott/jeecg-boot)
+[![](https://img.shields.io/badge/version-3.7.1-brightgreen.svg)](https://github.com/zhangdaiscott/jeecg-boot)
 [![GitHub stars](https://img.shields.io/github/stars/zhangdaiscott/jeecg-boot.svg?style=social&label=Stars)](https://github.com/zhangdaiscott/jeecg-boot)
 [![GitHub forks](https://img.shields.io/github/forks/zhangdaiscott/jeecg-boot.svg?style=social&label=Fork)](https://github.com/zhangdaiscott/jeecg-boot)
 
@@ -66,7 +66,7 @@ JeecgBoot 是一款基于代码生成器的`低代码开发平台`！前后端�
 - 基础框架：Spring Boot 2.7.18
 - 微服务框架： Spring Cloud Alibaba 2021.0.1.0
 - 持久层框架：MybatisPlus 3.5.3.2
-- 报表工具： JimuReport 1.7.6
+- 报表工具： JimuReport 1.8.1
 - 安全框架：Apache Shiro 1.12.0，Jwt 3.11.0
 - 微服务技术栈：Spring Cloud Alibaba、Nacos、Gateway、Sentinel、Skywalking
 - 数据库连接池：阿里巴巴Druid 1.1.22
@@ -97,6 +97,7 @@ JeecgBoot 是一款基于代码生成器的`低代码开发平台`！前后端�
 |   MariaDB   |  √   |
 |   达梦   |  √   |
 |   人大金仓   |  √   |
+|   TiDB   |  √   |
 
 
 

@@ -2,12 +2,12 @@
 JeecgBoot 低代码开发平台
 ===============
 
-当前最新版本： 3.7.0_all（发布日期：2024-06-23） 
+当前最新版本： 3.7.1（发布日期：2024-09-12） 
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/jeecgboot/JeecgBoot/blob/master/LICENSE)
 [![](https://img.shields.io/badge/Author-北京国炬软件-orange.svg)](http://guojusoft.com)
-[![](https://img.shields.io/badge/version-3.7.0_all-brightgreen.svg)](https://github.com/jeecgboot/JeecgBoot)
+[![](https://img.shields.io/badge/version-3.7.1-brightgreen.svg)](https://github.com/jeecgboot/JeecgBoot)
 [![GitHub stars](https://img.shields.io/github/stars/zhangdaiscott/jeecg-boot.svg?style=social&label=Stars)](https://github.com/jeecgboot/JeecgBoot)
 [![GitHub forks](https://img.shields.io/github/forks/zhangdaiscott/jeecg-boot.svg?style=social&label=Fork)](https://github.com/jeecgboot/JeecgBoot)
 
@@ -73,7 +73,7 @@ Jeecg-Boot低代码开发平台，可以应用在任何J2EE项目的开发中，
 - 基础框架：Spring Boot 2.7.18
 - 微服务框架： Spring Cloud Alibaba 2021.0.1.0
 - 持久层框架：MybatisPlus 3.5.3.2
-- 报表工具： JimuReport 1.7.6
+- 报表工具： JimuReport 1.8.1
 - 安全框架：Apache Shiro 1.12.0，Jwt 3.11.0
 - 微服务技术栈：Spring Cloud Alibaba、Nacos、Gateway、Sentinel、Skywalking
 - 数据库连接池：阿里巴巴Druid 1.1.22
@@ -87,10 +87,17 @@ Jeecg-Boot低代码开发平台，可以应用在任何J2EE项目的开发中，
 #### 前端
 
 - 前端IDE建议：WebStorm、Vscode
-- 采用 Vue3.0+TypeScript+Vite+Ant-Design-Vue等新技术方案，包括二次封装组件、utils、hooks、动态菜单、权限校验、按钮级别权限控制等功能
+- 采用 Vue3.0+TypeScript+Vite5+Ant-Design-Vue等新技术方案，包括二次封装组件、utils、hooks、动态菜单、权限校验、按钮级别权限控制等功能
 - 最新技术栈：Vue3.0 + TypeScript + Vite5 + ant-design-vue4 + pinia + echarts + unocss + vxe-table + qiankun + es6
 - 依赖管理：node、npm、pnpm
 
+
+#### 前端环境要求
+
+*   本地环境安装 `Node.js 、npm 、pnpm`
+*   Node.js 版本建议`v20.15.0`，要求`Node 20+` 版本以上
+
+ ` ( 因为Vite5 不再支持已 EOL 的 Node.js 14 / 16 / 17 / 19，现在需要 Node.js 18 / 20+ )`
 
 
 #### 支持库
@@ -102,9 +109,10 @@ Jeecg-Boot低代码开发平台，可以应用在任何J2EE项目的开发中，
 |  Sqlserver2017   |  √   |
 |   PostgreSQL   |  √   |
 |   MariaDB   |  √   |
+|   MariaDB   |  √   |
 |   达梦   |  √   |
 |   人大金仓   |  √   |
-
+|   TiDB     |  √   |
 
  
 ## 微服务解决方案

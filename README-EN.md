@@ -7,12 +7,12 @@
 JEECG BOOT Low Code Development Platform
 ===============
 
-Current version: 3.7.0_all (Release date: 2024-06-23)
+Current version: 3.7.1 (Release date: 2024-09-12)
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE)
 [![](https://img.shields.io/badge/Author-guojusoft-orange.svg)](http://www.jeecg.com)
-[![](https://img.shields.io/badge/version-3.7.0_all-brightgreen.svg)](https://github.com/zhangdaiscott/jeecg-boot)
+[![](https://img.shields.io/badge/version-3.7.1-brightgreen.svg)](https://github.com/zhangdaiscott/jeecg-boot)
 [![GitHub stars](https://img.shields.io/github/stars/zhangdaiscott/jeecg-boot.svg?style=social&label=Stars)](https://github.com/zhangdaiscott/jeecg-boot)
 [![GitHub forks](https://img.shields.io/github/forks/zhangdaiscott/jeecg-boot.svg?style=social&label=Fork)](https://github.com/zhangdaiscott/jeecg-boot)
 
@@ -195,7 +195,7 @@ Technical Architecture:
 
 - Persistence layer framework: MybatisPlus 3.5.3.2
 
-- Report tool: JimuReport 1.7.6
+- Report tool: JimuReport 1.8.1
 
 - Security framework: Apache Shiro 1.12.0, Jwt 3.11.0
 
@@ -212,6 +212,12 @@ Technical Architecture:
 
 - TechnologyStack：`Vue3.0+TypeScript+Vite+AntDesignVue+pinia+echarts`
 
+#### Front-end environment requirements
+
+*    `Node.js 、npm 、pnpm`
+*   Node.js Version suggestion: `v20.15.0`
+ ` ( Since Vite5 no longer supports EOL Node.js 14/16/17/19, Node.js 18/20 + is now required )`
+ 
 #### Support library
 
 |  database   |  support   |
@@ -223,6 +229,7 @@ Technical Architecture:
 |   MariaDB   |  √   |
 |   达梦   |  √   |
 |   人大金仓   |  √   |
+|   TiDB   |  √   |
 
 
 ## Microservice solutions
