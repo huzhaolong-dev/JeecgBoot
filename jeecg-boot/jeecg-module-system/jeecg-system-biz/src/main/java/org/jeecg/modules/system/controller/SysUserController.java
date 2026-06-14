@@ -1276,12 +1276,6 @@ public class SysUserController {
             updateUser.setUpdateBy(JwtUtil.getUserNameByToken(request));
             updateUser.setUpdateTime(new Date());
             sysUserService.revertLogicDeleted(Arrays.asList(userIds.split(",")), updateUser);
-            // 用户变更，触发同步工作流
-            List<String> userNameList = sysUserService.userIdToUsername(Arrays.asList(userIds.split(",")));
-            if (!userNameList.isEmpty()) {
-                String joinedString = String.join(",", userNameList);
-            }
-           
         }
         return Result.ok("还原成功");
     }
@@ -1849,5 +1843,20 @@ public class SysUserController {
     @RequestMapping(value = "/importAppUser", method = RequestMethod.POST)
     public Result<?> importAppUser(HttpServletRequest request, HttpServletResponse response)throws IOException {
         return sysUserService.importAppUser(request);
+    }
+
+    /**
+     * 发送短信验证码接口(修改手机号)
+     *
+     * @param jsonObject
+     * @return
+     */
+    @PostMapping(value = "/sendChangePhoneSms")
+    public Result<String> sendChangePhoneSms(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
+        //获取登录用户名
+        String username = JwtUtil.getUserNameByToken(request);
+        String ipAddress = IpUtils.getIpAddr(request);
+        sysUserService.sendChangePhoneSms(jsonObject, username, ipAddress);
+        return Result.ok("发送验证码成功！");
     }
 }
